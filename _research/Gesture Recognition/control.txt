@@ -1,0 +1,15 @@
+Left hand:	touch = speed
+Right hand:	rotation movements changes direction
+
+
+Left hand:	touch = speed
+Right hand:	swipes left/right change direction
+
+
+Left hand:	touch = speed
+Right hand:	two-finger rotations change direction
+
+
+Gestures for specials:
+*	Cover the creature with your thumb, so that it can change (it's shy)
+*	Other gestures like in black&white for magic (spiral, square, triangle, etc..)
