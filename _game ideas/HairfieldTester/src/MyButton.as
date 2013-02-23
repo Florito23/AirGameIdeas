@@ -26,6 +26,7 @@ package
 		//private var VerdanaBold:Class;
 		
 		private var _touchFunc:Function;
+		private var btf:TextField;
 		
 		public function MyButton(w:int, h:int, color:uint, text:String, tColor:uint, touchFunc:Function) 
 		{
@@ -59,7 +60,7 @@ package
 			//addChild(new Image(texture));
 			addChild(new Quad(w, h, color));
 			
-			var btf:TextField = new TextField(w, h, text, "Verdana", 12, tColor, true);
+			btf = new TextField(w, h, text, "Verdana", 12, tColor, true);
 			btf.hAlign = HAlign.CENTER;
 			addChild(btf);
 			
@@ -67,8 +68,14 @@ package
 			
 			this._touchFunc = touchFunc;
 			
-			//flatten();
+			flatten();
 			addEventListener(TouchEvent.TOUCH, onTouch);
+		}
+		
+		public function set text(value:String):void {
+			unflatten();
+			btf.text = value;
+			flatten();
 		}
 		
 		private function onTouch(e:TouchEvent):void 

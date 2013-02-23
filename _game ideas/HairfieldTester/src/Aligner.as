@@ -7,17 +7,21 @@ package
 	 */
 	public class Aligner 
 	{
+	
+		
+		private static var _SMOOTH:Number = 0.98;
+		private static var _INV_SMOOTH:Number = 1.0 - SMOOTH;
 		
 		private var _width:int;
 		private var _height:int;
-		private var _lines:Vector.<Line>;
+		private var _lines:Vector.<HairfieldLine>;
 		private var _linesAmount:int;
 		private var _cosines:Vector.<Number>;
 		private var _sines:Vector.<Number>;
 		private var _futureRotations:Vector.<Number>;
 		private var _neighbourIndices:Vector.<Vector.<int>>;
 		
-		public function Aligner(width:int, height:int, lines:Vector.<Line>) 
+		public function Aligner(width:int, height:int, lines:Vector.<HairfieldLine>) 
 		{
 			this._width = width;
 			this._height = height;
@@ -31,7 +35,7 @@ package
 				for (var x:int = 0; x < width; x++) {
 					
 					// each line
-					var sourceLine:Line = lines[index];
+					var sourceLine:HairfieldLine = lines[index];
 					var neighbours:Vector.<int> = new Vector.<int>();
 					for (var yo:int = -1; yo <= 1;yo++) {
 						for (var xo:int = -1; xo <= 1; xo++) {
@@ -65,7 +69,7 @@ package
 			var x:int, y:int;
 			var neighbours:Vector.<int>;
 			var neighbourAmount:int;
-			var neighbour:Line;
+			var neighbour:HairfieldLine;
 			var rot:Number, lx:Number, ly:Number;
 			var nRot:Number, dx:Number, dy:Number;
 			var fx:Number, fy:Number;
@@ -108,8 +112,8 @@ package
 						//dx +
 					}
 					
-					fx = dx * 0.1 + lx * 0.9;
-					fy = dy * 0.1 + ly * 0.9;
+					fx = dx * _INV_SMOOTH + lx * _SMOOTH;
+					fy = dy * _INV_SMOOTH + ly * _SMOOTH;
 					
 					_futureRotations[index] = Math.atan2(fy, fx);
 					
@@ -126,6 +130,20 @@ package
 			
 			
 			return (getTimer() - ti);
+		}
+		
+		
+		
+		
+		static public function set SMOOTH(value:Number):void 
+		{
+			_SMOOTH = value;
+			_INV_SMOOTH = 1.0 - value;
+		}
+		
+		static public function get SMOOTH():Number 
+		{
+			return _SMOOTH;
 		}
 		
 	}
