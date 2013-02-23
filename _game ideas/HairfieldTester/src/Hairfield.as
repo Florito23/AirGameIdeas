@@ -1,5 +1,6 @@
 package  
 {
+	import flash.desktop.NativeApplication;
 	import flash.utils.getTimer;
 	import starling.display.BlendMode;
 	import starling.display.Button;
@@ -11,6 +12,7 @@ package
 	import starling.events.Touch;
 	import starling.events.TouchEvent;
 	import starling.events.TouchPhase;
+	import starling.text.BitmapFont;
 	import starling.text.TextField;
 	import starling.utils.HAlign;
 	import starling.utils.VAlign;
@@ -29,15 +31,15 @@ package
 		private var HAIR_ALPHA:Number = 1.0;
 		private var BATCH_ALPHA:Number = 1.0;
 				
-		
 		private var _yAmount:int, _xAmount:int;
 		
 		private var _lineAmount:int;
 		private var _lines:Vector.<Line>;
 		private var _lineBatch:QuadBatch;
 		
-		//private var _initOnFrame:Boolean = false;
-		//private var _decreaseOnInit:Boolean = false;
+		private var _aligner:Aligner;
+		
+		private var _updatingStats:TextField;
 		
 		public function Hairfield() 
 		{
@@ -51,7 +53,16 @@ package
 			
 			initLines();
 			
+			stage.addEventListener(TouchEvent.TOUCH, onStageTouch);
+			
 			addEventListener(EnterFrameEvent.ENTER_FRAME, frame);
+		}
+		
+		private function onStageTouch(e:TouchEvent):void 
+		{
+			if (e.getTouch(stage, TouchPhase.BEGAN)) {
+				reInitialize();
+			}
 		}
 		
 		
@@ -75,12 +86,15 @@ package
 					l.y = yOffset + yi * HAIR_DISTANCE;
 					l.blendMode = BlendMode.ADD;
 					l.touchable = false;
-					l.rotation = 2 * Math.PI * Math.random();
+					l.rotation = 2 * Math.PI * Math.random();// * 10;
 					l.alpha = HAIR_ALPHA;
 					_lines[index] = l;
 					index++;
 				}
 			}
+			
+			_aligner = new Aligner(_xAmount, _yAmount, _lines);
+			
 			
 			_lineBatch = new QuadBatch();
 			//_lineBatch.blendMode = BlendMode.ADD;
@@ -88,6 +102,19 @@ package
 			_lineBatch.touchable = false;
 			addChild(_lineBatch);
 			
+			
+			
+			//STATS
+			var statSprite:Sprite = new Sprite();
+			var q:Quad = new Quad(100, 100, 0x000000);
+			_updatingStats = new TextField(100, 100, "Stats", BitmapFont.MINI, BitmapFont.NATIVE_SIZE, 0xffffff);
+			_updatingStats.hAlign = HAlign.LEFT;
+			_updatingStats.vAlign = VAlign.TOP;
+			statSprite.addChild(q);
+			statSprite.addChild(_updatingStats);
+			statSprite.x = 2;
+			statSprite.y = 200;
+			addChild(statSprite);
 			
 			
 			// UI
@@ -102,7 +129,7 @@ package
 			tf.x = stage.stageWidth - 200 - 10;
 			uiSprite.addChild(tf);
 			
-			var _increaseButton:MyButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "increase", 0xffffff, function():void { 
+			var _increaseButton:MyButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "Increase", 0xffffff, function():void { 
 				HAIR_DISTANCE /= 1.05;
 				reInitialize();
 			} );
@@ -110,16 +137,23 @@ package
 			_increaseButton.y = stage.stageHeight - (bHeight+bSpacing)*3;
 			uiSprite.addChild(_increaseButton);
 			
-			var _decreaseButton:MyButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "decrease", 0xffffff, function():void { 
+			var _decreaseButton:MyButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "Decrease", 0xffffff, function():void { 
 				HAIR_DISTANCE *= 1.05;
 				reInitialize();
 			} );
 			_decreaseButton.x = bSpacing;
-			_decreaseButton.y = _increaseButton.y + bHeight + 10;
+			_decreaseButton.y = _increaseButton.y + bHeight + bSpacing;
 			uiSprite.addChild(_decreaseButton);
 			
-			var _hairAlphaButton:MyButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "hair alpha", 0xffffff, function():void { 
-				HAIR_ALPHA = 0.3;
+			var _exitButton:MyButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "Exit", 0xffffff, function():void { 
+				NativeApplication.nativeApplication.exit();
+			} );
+			_exitButton.x = bSpacing;
+			_exitButton.y = _decreaseButton.y + bHeight + bSpacing;
+			uiSprite.addChild(_exitButton);
+			
+			var _hairAlphaButton:MyButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "Hair alpha", 0xffffff, function():void { 
+				HAIR_ALPHA = 0.5;
 				BATCH_ALPHA = 1.0;
 				reInitialize();
 			});
@@ -127,16 +161,16 @@ package
 			_hairAlphaButton.y = _increaseButton.y
 			uiSprite.addChild(_hairAlphaButton);
 			
-			var _batchAlphaButton:MyButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "batch alpha", 0xffffff, function():void { 
+			var _batchAlphaButton:MyButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "Batch alpha", 0xffffff, function():void { 
 				HAIR_ALPHA = 1.0;
-				BATCH_ALPHA = 0.3;
+				BATCH_ALPHA = 0.5;
 				reInitialize();
 			});
 			_batchAlphaButton.x = _hairAlphaButton.x;
 			_batchAlphaButton.y = _hairAlphaButton.y +bHeight + bSpacing;
 			uiSprite.addChild(_batchAlphaButton);
 			
-			var _noAlphaButton:MyButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "no alpha", 0xffffff, function():void { 
+			var _noAlphaButton:MyButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "No alpha-ing", 0xffffff, function():void { 
 				HAIR_ALPHA = 1.0;
 				BATCH_ALPHA = 1.0;
 				reInitialize();
@@ -157,23 +191,14 @@ package
 		}
 		
 		
-		/*private function toggleAlpha():void {
-			if (HAIR_ALPHA == 1) {
-				HAIR_ALPHA = 0.3;
-			} else {
-				HAIR_ALPHA = 1;
-			}
-			trace("toggle alpha", HAIR_ALPHA);
-			_initOnFrame = true;
-		}*/
-		
-		
 		private function frame(e:EnterFrameEvent):void 
 		{
-			/*if (_initOnFrame) {
-				_initOnFrame = false;
-				reInitialize(_decreaseOnInit);
-			}*/
+			var alignTime:int = _aligner.align();
+			var timePerHair:Number = alignTime / _lineAmount;
+			
+			_updatingStats.text = "STATS:\n" +
+				"Aligner " + alignTime + " ms\n" +
+				"-> per hair " + timePerHair.toFixed(4)+" ms";
 			
 			_lineBatch.reset();
 			for (var i:int = 0; i < _lineAmount; i++) {
