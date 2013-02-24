@@ -1,12 +1,15 @@
 package  
 {
 	import flash.desktop.NativeApplication;
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.geom.Point;
 	import flash.utils.getTimer;
 	import hairfield.Hairfield;
 	import starling.display.BlendMode;
 	import starling.display.Button;
 	import starling.display.DisplayObjectContainer;
+	import starling.display.Image;
 	import starling.display.Quad;
 	import starling.display.QuadBatch;
 	import starling.display.Sprite;
@@ -17,6 +20,7 @@ package
 	import starling.events.TouchPhase;
 	import starling.text.BitmapFont;
 	import starling.text.TextField;
+	import starling.textures.Texture;
 	import starling.utils.HAlign;
 	import starling.utils.VAlign;
 	
@@ -48,7 +52,7 @@ package
 		/*
 		 * Hairfield drawing
 		 */
-		public var HAIR_DISTANCE:Number = 25;// 12.7; // -> 80x60 on iPad
+		public var HAIR_DISTANCE:Number = 35;// 12.7; // -> 80x60 on iPad
 		public static const HAIR_LENGTH:Number = 60;
 		public static const HAIR_WIDTH:Number = 1;
 		private var HAIR_ALPHA:Number = 1.0;
@@ -56,7 +60,11 @@ package
 		
 		private var hWidth:int;
 		private var hHeight:int;
-		private var _lines:Vector.<HairfieldLine>;
+		
+		
+		//private var _lines:Vector.<HairfieldLine>;
+		private var _lines:Vector.<HairfieldLineImage>;
+		
 		private var _lineAmount:int;
 		private var _lineBatch:QuadBatch;
 		private var _hairfieldSprite:Sprite;
@@ -138,9 +146,19 @@ package
 			
 			
 			
-			_lines = new Vector.<HairfieldLine>();
+			//_lines = new Vector.<HairfieldLine>();
+			_lines = new Vector.<HairfieldLineImage>(hWidth*hHeight);
 			
 			// Create Drawable lines
+			
+			//perlin noise offset
+			var bmp:BitmapData = new BitmapData(hWidth, hHeight);
+			bmp.perlinNoise(hWidth, hHeight, 3, getTimer() * Math.random(), false, false, 7);
+			/*var img:Image = new Image(Texture.fromBitmapData(bmp));
+			img.width = stage.stageWidth;
+			img.height = stage.stageHeight;
+			addChildAt(img, 0);*/
+			
 			
 			// numbers needed for calcing from stage to index coordinates
 			var x0:Number, x1:Number, y0:Number, y1:Number;
@@ -149,11 +167,20 @@ package
 			var xOffset:Number = (stage.stageWidth - (hWidth-1) * HAIR_DISTANCE) / 2;
 			var yOffset:Number = (stage.stageHeight - (hHeight-1) * HAIR_DISTANCE) / 2;
 			var index:int = 0;
+			var noiseRed:Number, noiseGreen:Number;
+			var noiseBlue:int;
 			for (var yi:int = 0; yi < hHeight; yi++) {
 				for (var xi:int = 0; xi < hWidth; xi++) {
-					var l:HairfieldLine = new HairfieldLine(HAIR_LENGTH, HAIR_WIDTH, 0xf02208);
-					l.x = xOffset + xi * HAIR_DISTANCE;
-					l.y = yOffset + yi * HAIR_DISTANCE;
+					//var l:HairfieldLine = new HairfieldLine(HAIR_LENGTH, HAIR_WIDTH, 0xf02208);
+					noiseRed = ((bmp.getPixel(xi, yi)>>16 & 0xff)/255.0 - 0.5) * 2;
+					noiseGreen = ((bmp.getPixel(xi, yi) >> 8 & 0xff) / 255.0 - 0.5) * 2;
+					noiseBlue = bmp.getPixel(xi, yi) & 0xff;
+					//trace(noiseRed, noiseGreen);
+					var l:HairfieldLineImage = new HairfieldLineImage();// HAIR_LENGTH, HAIR_WIDTH, 0xf02208);
+					if (noiseBlue < 50) l.visible = false;
+					//else if (noiseBlue < 100) l.alpha = map(noiseBlue, 50, 99, 0, 1);
+					l.x = xOffset + xi * HAIR_DISTANCE + noiseRed * HAIR_DISTANCE;
+					l.y = yOffset + yi * HAIR_DISTANCE + noiseGreen * HAIR_DISTANCE;
 					x0 = Math.min(x0, l.x);
 					y0 = Math.min(y0, l.y);
 					x1 = Math.max(x1, l.x);
@@ -168,12 +195,14 @@ package
 			}
 			_lineAmount = _lines.length;
 			
+			//_lines[int(_lineAmount / 2)].debug = true;
+			
 			
 			// for scaling swipes to indices:
 			
 			// set the limiting points for the indices
 			_indexPoint0 = new Point(0, 0);
-			_indexPoint1 = new Point(hWidth - 1, hHeight - 1);
+			_indexPoint1 = new Point(hWidth, hHeight);
 			// set the limiting points for the stage coordinates
 			_stagePoint0 = new Point(x0, y0);
 			_stagePoint1 = new Point(x1, y1);
@@ -224,6 +253,11 @@ package
 			
 		}
 		
+		private static function map(v:int, v0:Number, v1:Number, w0:Number, w1:Number):Number 
+		{
+			return w0 + (w1 - w0) * (v - v0) / (v1 - v0);
+		}
+		
 		
 		private function initGui():void {
 			
@@ -247,21 +281,26 @@ package
 			var bHeight:int = 50;
 			var bSpacing:int = 10;
 			
+			var BUTTON_COLOR:int = 0x222222;
+			var BUTTON_TEXT_COLOR:int = 0x888888;
+			
 			// BUTTON: SHOW UI
-			_showUIButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "Hide UI", 0xffffff, function():void { 
+			_showUIButton = new MyButton(bWidth, bHeight, BUTTON_COLOR, "Hide UI", BUTTON_TEXT_COLOR, function():void { 
 				_showUIButton.unflatten();
 				if (_showUIButton.alpha == 1) {
 					_showUIButton.alpha = 0.2;
 					_showUIButton.text = "Show UI";
 					_statSprite.visible = false;
 					_increaseButton.visible = _decreaseButton.visible = _exitButton.visible = false;
-					_showTouchButton.visible = _hairAlphaButton.visible = _batchAlphaButton.visible = _noAlphaButton.visible = false;
+					_showTouchButton.visible = _hairAlphaButton.visible = _batchAlphaButton.visible = false;
+					_noAlphaButton.alpha = 0.2;
 				} else {
 					_showUIButton.alpha = 1;
 					_showUIButton.text = "Hide UI";
 					_statSprite.visible = true;
 					_increaseButton.visible = _decreaseButton.visible = _exitButton.visible = true;
-					_showTouchButton.visible = _hairAlphaButton.visible = _batchAlphaButton.visible = _noAlphaButton.visible = true;
+					_showTouchButton.visible = _hairAlphaButton.visible = _batchAlphaButton.visible = true;
+					_noAlphaButton.alpha = 1;
 				}
 				_showUIButton.flatten();
 			} );
@@ -271,7 +310,7 @@ package
 			uiSprite.addChild(_showUIButton);
 			
 			// BUTTON: show finger trace
-			_showTouchButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "Show trace " + _fingerDrawer.drawOnScreen, 0xffffff, function():void {
+			_showTouchButton = new MyButton(bWidth, bHeight, BUTTON_COLOR, "Show trace " + _fingerDrawer.drawOnScreen, BUTTON_TEXT_COLOR, function():void {
 				_fingerDrawer.drawOnScreen = !_fingerDrawer.drawOnScreen;
 				_showTouchButton.text = "Show finger " + _fingerDrawer.drawOnScreen;
 			});
@@ -280,7 +319,7 @@ package
 			uiSprite.addChild(_showTouchButton);
 			
 			
-			_increaseButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "Increase", 0xffffff, function():void { 
+			_increaseButton = new MyButton(bWidth, bHeight, BUTTON_COLOR, "Increase", BUTTON_TEXT_COLOR, function():void { 
 				HAIR_DISTANCE /= 1.05;
 				initLines();
 			} );
@@ -288,7 +327,7 @@ package
 			_increaseButton.y = stage.stageHeight - (bHeight+bSpacing)*3;
 			uiSprite.addChild(_increaseButton);
 			
-			_decreaseButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "Decrease", 0xffffff, function():void { 
+			_decreaseButton = new MyButton(bWidth, bHeight, BUTTON_COLOR, "Decrease", BUTTON_TEXT_COLOR, function():void { 
 				HAIR_DISTANCE *= 1.05;
 				initLines();
 			} );
@@ -296,14 +335,14 @@ package
 			_decreaseButton.y = _increaseButton.y + bHeight + bSpacing;
 			uiSprite.addChild(_decreaseButton);
 			
-			_exitButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "Exit", 0xffffff, function():void { 
+			_exitButton = new MyButton(bWidth, bHeight, BUTTON_COLOR, "Exit", BUTTON_TEXT_COLOR, function():void { 
 				NativeApplication.nativeApplication.exit();
 			} );
 			_exitButton.x = bSpacing;
 			_exitButton.y = _decreaseButton.y + bHeight + bSpacing;
 			uiSprite.addChild(_exitButton);
 			
-			_hairAlphaButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "Hair alpha", 0xffffff, function():void { 
+			_hairAlphaButton = new MyButton(bWidth, bHeight, BUTTON_COLOR, "Hair alpha", BUTTON_TEXT_COLOR, function():void { 
 				HAIR_ALPHA = 0.5;
 				BATCH_ALPHA = 1.0;
 				initLines();
@@ -312,7 +351,7 @@ package
 			_hairAlphaButton.y = _increaseButton.y
 			uiSprite.addChild(_hairAlphaButton);
 			
-			_batchAlphaButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "Batch alpha", 0xffffff, function():void { 
+			_batchAlphaButton = new MyButton(bWidth, bHeight, BUTTON_COLOR, "Batch alpha", BUTTON_TEXT_COLOR, function():void { 
 				HAIR_ALPHA = 1.0;
 				BATCH_ALPHA = 0.5;
 				initLines();
@@ -321,7 +360,7 @@ package
 			_batchAlphaButton.y = _hairAlphaButton.y +bHeight + bSpacing;
 			uiSprite.addChild(_batchAlphaButton);
 			
-			_noAlphaButton = new MyButton(bWidth, bHeight, 0xaaaaaa, "No alpha-ing", 0xffffff, function():void { 
+			_noAlphaButton = new MyButton(bWidth, bHeight, BUTTON_COLOR, "No alpha-ing", BUTTON_TEXT_COLOR, function():void { 
 				HAIR_ALPHA = 1.0;
 				BATCH_ALPHA = 1.0;
 				initLines();
@@ -350,6 +389,7 @@ package
 			var hLines:Vector.<Number> = _field.lines;
 			for (i = 0; i < _lineAmount; i++) {
 				_lines[i].rotation = hLines[i]; // TODO: desktop: 2% of overall calculations @ 80x60 (setting rotations)
+				_lines[i].animate();
 			}
 			
 			
@@ -435,6 +475,10 @@ package
 			}*/
 			
 			_field.setDirections(indicesToModify, lineAB.direction);
+			var amount:int = indicesToModify.length;
+			for (var i:int = 0; i < amount; i++) {
+				_lines[indicesToModify[i]].touch();
+			}
 			
 			_fingerSwipeTime = getTimer() - _fingerSwipeTime;
 		}
@@ -444,6 +488,10 @@ package
 			var out:Vector.<Point> = new Vector.<Point>(cornerPoints.length);
 			for (var i:int = 0; i < cornerPoints.length; i++) {
 				out[i] = mapPoint(cornerPoints[i], _stagePoint0, _stagePoint1, _indexPoint0, _indexPoint1, true);
+				if (out[i].x < 0) out[i].x = 0;
+				else if (out[i].x >= hWidth) out[i].x = hWidth - 1;
+				if (out[i].y < 0) out[i].y = 0;
+				else if (out[i].y >= hWidth) out[i].y = hHeight - 1;
 			}
 			return out;
 		}

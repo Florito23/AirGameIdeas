@@ -8,7 +8,7 @@ package hairfield
 	public class Hairfield 
 	{
 		
-		private static var _SMOOTH:Number = 0.975;
+		private static var _SMOOTH:Number = 0.985;
 		private static var _INV_SMOOTH:Number = 1.0 - SMOOTH;
 		
 		
@@ -53,10 +53,20 @@ package hairfield
 							
 							var nx:int = x + xo;
 							var ny:int = y + yo;
+							
+							// ignore wall neighbors
 							if (nx >= 0 && nx < width && ny >= 0 && ny < height) {// include self && !(xo==0&&yo==0)) {
 								var nIndex:int = ny * width + nx;
 								neighbours.push(nIndex);// lines[nIndex]);
 							}
+							
+							//clip over edge neighbors:
+							/*if (nx < 0) nx += width; 
+							else if (nx >= width) nx -= width;
+							if (ny < 0) ny += height;
+							else if (ny >= height) ny -= height;
+							var nIndex:int = ny * width + nx;
+							neighbours.push(nIndex);*/
 							
 						}
 					}
