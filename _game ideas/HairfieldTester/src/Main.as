@@ -31,7 +31,7 @@ package
 			var iOS:Boolean = Capabilities.manufacturer.indexOf("iOS") != -1;
             Starling.handleLostContext = !iOS;  // not necessary on iOS. Saves a lot of memory!
 			
-			starling = new Starling(Hairfield, stage);
+			starling = new Starling(HairfieldRenderer, stage);
 			starling.simulateMultitouch = true;
 			starling.showStats = true;
 			starling.start();

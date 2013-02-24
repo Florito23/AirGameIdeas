@@ -16,7 +16,7 @@ package
 			pivotY = width / 2;
 		}
 		
-		
+		//TODO: instead of rotating this object, maybe actually create the corret points?
 	}
 
 }

@@ -19,8 +19,6 @@ package
 		
 		private var fourPoints:Vector.<Point>;
 		
-		//TODO: Convert this object into a non-display-list object, maybe add a renderer just for testing purposes
-		
 		public function LineAB(ax:Number, ay:Number, bx:Number, by:Number, lineWidth:Number) 
 		{
 			
@@ -50,6 +48,10 @@ package
 			cp1.x = bx + dirVec.x; cp1.y = by - dirVec.y;
 			cp2.x = ax - dirVec.x; cp2.y = ay + dirVec.y;
 			cp3.x = bx - dirVec.x; cp3.y = by + dirVec.y;
+			
+			fourPoints = new <Point>[
+				cp0,cp1,cp2,cp3
+			];
 		}
 		
 		
@@ -83,9 +85,7 @@ package
 		 * @return
 		 */
 		public function getCornerPoints():Vector.<Point> {
-			return new <Point>[
-				cp0,cp1,cp2,cp3
-			];
+			return fourPoints;
 		}
 		
 		public function get direction():Number 
