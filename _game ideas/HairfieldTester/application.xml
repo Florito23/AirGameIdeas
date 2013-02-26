@@ -38,6 +38,7 @@
     <!--<autoOrients>false</autoOrients>-->
     <!--<aspectRatio>landscape</aspectRatio>-->
     <renderMode>direct</renderMode>
+	<depthAndStencil>false</depthAndStencil>
     <systemChrome>standard</systemChrome>
     <aspectRatio>landscape</aspectRatio>
     <autoOrients>false</autoOrients>
