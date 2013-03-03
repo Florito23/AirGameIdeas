@@ -136,6 +136,7 @@ package
 		}
 		
 		
+		private var _linesActuallyDrawn:int = 0;
 		
 		private function initLines():void {
 			
@@ -169,6 +170,7 @@ package
 			var index:int = 0;
 			var noiseRed:Number, noiseGreen:Number;
 			var noiseBlue:int;
+			_linesActuallyDrawn = 0;
 			for (var yi:int = 0; yi < hHeight; yi++) {
 				for (var xi:int = 0; xi < hWidth; xi++) {
 					//var l:HairfieldLine = new HairfieldLine(HAIR_LENGTH, HAIR_WIDTH, 0xf02208);
@@ -177,7 +179,11 @@ package
 					noiseBlue = bmp.getPixel(xi, yi) & 0xff;
 					//trace(noiseRed, noiseGreen);
 					var l:HairfieldLineImage = new HairfieldLineImage();// HAIR_LENGTH, HAIR_WIDTH, 0xf02208);
-					if (noiseBlue < 50) l.visible = false;
+					if (noiseBlue < 50) {
+						l.visible = false;
+					} else {
+						_linesActuallyDrawn++;
+					}
 					//else if (noiseBlue < 100) l.alpha = map(noiseBlue, 50, 99, 0, 1);
 					l.x = xOffset + xi * HAIR_DISTANCE + noiseRed * HAIR_DISTANCE;
 					l.y = yOffset + yi * HAIR_DISTANCE + noiseGreen * HAIR_DISTANCE;
@@ -378,6 +384,7 @@ package
 		private function frame(e:EnterFrameEvent):void 
 		{
 		
+			//trace(this, "frame");
 			
 			var i:int;
 			var alignTime:int=0;
@@ -395,11 +402,14 @@ package
 			
 			_updatingStats.text = "STATS:\n\n" +
 				"Dimension " + hWidth + "x" + hHeight + "\n" +
-				"LineAmount = " + _lineAmount + "\n\n" +
+				"LineAmount = " + _lineAmount + "\n" +
+				"Lines actually drawn = " + _linesActuallyDrawn + "\n\n" +
 				"Aligner " + alignTime + " ms\n" +
 				"-> per hair " + int(timePerHair*10000)/1000.0 + " ms\n" + //.toFixed(4)
 				"SwipeCalc "+_fingerSwipeTime + "ms\n";
 			_fingerSwipeTime = 0;
+			
+			trace("lineAmount", _lineAmount, "lines actuall drawn", _linesActuallyDrawn);
 				
 			switch (_mode) {
 				case MODE_USE_BATCH:
@@ -439,6 +449,7 @@ package
 			var cornerPoints:Vector.<Point> = lineAB.getCornerPoints();// Vector.<Point>;
 			var indexCornerPoints:Vector.<Point> = convertSpriteToFieldIndex(cornerPoints);
 			
+			//TODO: should i not check the width/height of the indices just to be sure???
 			var indicesToModify:Vector.<int> = new Vector.<int>();
 			var p00:Point = indexCornerPoints[0];
 			var p10:Point = indexCornerPoints[1];

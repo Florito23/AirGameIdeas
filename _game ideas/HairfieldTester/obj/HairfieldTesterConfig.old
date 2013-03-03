@@ -16,7 +16,7 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'26/02/2013'</value>
+      <value>'27/02/2013'</value>
     </define>
     <define append="true">
       <name>CONFIG::air</name>
@@ -40,7 +40,7 @@
     </source-path>
   </compiler>
   <file-specs>
-    <path-element>D:\AirGameIdeas\_game ideas\HairfieldTester\src\drawingc3d\Main.as</path-element>
+    <path-element>D:\AirGameIdeas\_game ideas\HairfieldTester\src\Main.as</path-element>
   </file-specs>
   <default-background-color>#000000</default-background-color>
   <default-frame-rate>60</default-frame-rate>

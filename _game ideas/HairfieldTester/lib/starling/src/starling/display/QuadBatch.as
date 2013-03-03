@@ -11,6 +11,7 @@
 package starling.display
 {
     import com.adobe.utils.AGALMiniAssembler;
+	import flash.utils.getTimer;
     
     import flash.display3D.Context3D;
     import flash.display3D.Context3DProgramType;
@@ -170,9 +171,12 @@ package starling.display
             if (numVertices == 0) return;
             if (context == null)  throw new MissingContextError();
             
+			var t:int = getTimer();
+			trace(this,"createBuffers(): Creating & uploading buffers - vertices = ", numVertices,", totalparams = ",mVertexData.rawData.length);
             mVertexBuffer = context.createVertexBuffer(numVertices, VertexData.ELEMENTS_PER_VERTEX);
             mVertexBuffer.uploadFromVector(mVertexData.rawData, 0, numVertices);
-            
+            trace("in", (getTimer() - t), "ms");
+			
             mIndexBuffer = context.createIndexBuffer(numIndices);
             mIndexBuffer.uploadFromVector(mIndexData, 0, numIndices);
             
@@ -188,8 +192,10 @@ package starling.display
             {
                 // as 3rd parameter, we could also use 'mNumQuads * 4', but on some GPU hardware (iOS!),
                 // this is slower than updating the complete buffer.
-                
+				var t:int = getTimer();
+                trace(this,"syncBuffers(): Uploading buffers - vertices = ", mVertexData.numVertices,", totalparams = ",mVertexData.rawData.length);
                 mVertexBuffer.uploadFromVector(mVertexData.rawData, 0, mVertexData.numVertices);
+				trace("in", (getTimer() - t), "ms");
                 mSyncRequired = false;
             }
         }
