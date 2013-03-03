@@ -1,7 +1,9 @@
 package  
 {
 	import flash.desktop.NativeApplication;
+	import flash.events.AccelerometerEvent;
 	import flash.geom.Vector3D;
+	import flash.sensors.Accelerometer;
 	import flash.utils.Dictionary;
 	import flash.utils.getTimer;
 	import starling.display.Quad;
@@ -31,22 +33,38 @@ package
 		private var springLineDictionary:Dictionary = new Dictionary();
 		private var particleWereFixedDictionary:Dictionary = new Dictionary();
 		
-		private var PARTICLE_SCREEN_SIZE:Number = 40;
+		private var PARTICLE_SCREEN_SIZE:Number = 60;
 		private var PARTICLE_FIXED_COLOR:uint = 0xffff0000;
 		private var PARTICLE_FREE_COLOR:uint = 0xff0088ff;
 		
-		private var SPRING_AMOUNT:int = 12;
-		private var SPRING_CONSTANT:Number = 0.5;
-		private var SPRING_DAMPING:Number = 0.2;
+		private var SPRING_AMOUNT:int = 6;
+		private var SPRING_CONSTANT:Number = 0.2;	//0.5
+		private var SPRING_DAMPING:Number = 0.2;	//0.2
+		private var springLength:Number;
 		
 		private var DOUBLE_TOUCH_TIME:int = 200;
 		
 		private var draggingQuads:Array = new Array();
 		
+		private var soundEngine:SoundEngine;
+		
+		private var acc:Accelerometer;
+		
 		public function SoundLineGame() 
 		{
 			addEventListener(Event.ADDED_TO_STAGE, init);
 			
+			acc = new Accelerometer();
+			acc.addEventListener(AccelerometerEvent.UPDATE, accUpdate);
+			
+			// init sound
+			soundEngine = new SoundEngine(SPRING_AMOUNT);
+			soundEngine.multiTrack.gain = 1.0 / SPRING_AMOUNT;
+		}
+		
+		private function accUpdate(e:AccelerometerEvent):void 
+		{
+			physics.setGravity(new Vector3D(-e.accelerationX*10, 2 + e.accelerationY*10, 0));
 		}
 		
 		private function init(e:Event):void 
@@ -54,11 +72,11 @@ package
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			
 			// init physics
-			physics = new ParticleSystem(new Vector3D(0, 2, 0), 0.15);
+			physics = new ParticleSystem(new Vector3D(0, 2, 0), 0.02);
 			
 			// create two points
-			var aPos:Vector3D = new Vector3D(stage.stageWidth * 0.15, stage.stageHeight * 0.5, 0);
-			var bPos:Vector3D = new Vector3D(stage.stageWidth * 0.85, stage.stageHeight * 0.5, 0);
+			var aPos:Vector3D = new Vector3D(stage.stageWidth * 0.10, stage.stageHeight * 0.25, 0);
+			var bPos:Vector3D = new Vector3D(stage.stageWidth * 0.90, stage.stageHeight * 0.25, 0);
 			A = physics.makeParticle(0.5, aPos);
 			B = physics.makeParticle(0.5, bPos);
 			A.fixed = true;
@@ -74,7 +92,7 @@ package
 			var dy:Number = ab.y;
 			var dStepX:Number = dx / springCount;
 			var dStepY:Number = dy / springCount;
-			var stepLen:Number = Math.sqrt(dStepX * dStepX + dStepY * dStepY);
+			springLength = Math.sqrt(dStepX * dStepX + dStepY * dStepY);
 			
 			var particles:Vector.<Particle> = new Vector.<Particle>();
 			var springs:Vector.<Spring> = new Vector.<Spring>();
@@ -94,9 +112,9 @@ package
 					a = particles[i-1];
 					b = particles[i]
 				}
-				springs.push(physics.makeSpring(a, b, SPRING_CONSTANT, SPRING_DAMPING, stepLen));
+				springs.push(physics.makeSpring(a, b, SPRING_CONSTANT, SPRING_DAMPING, springLength));
 				if (i == particleCount - 1) {
-					springs.push(physics.makeSpring(particles[i], B, SPRING_CONSTANT, SPRING_DAMPING, stepLen));
+					springs.push(physics.makeSpring(particles[i], B, SPRING_CONSTANT, SPRING_DAMPING, springLength));
 				}
 				
 			}
@@ -246,6 +264,25 @@ package
 			
 			physics.tick();
 			
+			// calc spring lengths / positions -> pitch / pan
+			var numSprings:int = physics.numberOfSprings();
+			var spring:Spring;
+			var stretchFac:Number;
+			var a:Vector3D, b:Vector3D;
+			var sx:Number;
+			for (var s:int = 0; s < numSprings; s++) {
+				spring = physics.getSpring(s);
+				stretchFac = spring.currentLength()/ springLength;
+				soundEngine.setPitchFactor(s, stretchFac);
+				
+				a = spring.getOneEnd().position;
+				b = spring.getOneEnd().position;
+				sx = (a.x + b.x) * 0.5;
+				soundEngine.multiTrack.getSource(s).panning = map(sx, 0, stage.stageWidth, -1, 1);
+				
+			}
+			
+			
 			// draw quads:
 			var particle:Particle;
 			var quad:Quad;
@@ -258,7 +295,6 @@ package
 			}
 			
 			// draw springs;
-			var spring:Spring;
 			var line:QuadLine;
 			for (o in springLineDictionary) {
 				spring = o as Spring;
@@ -291,7 +327,9 @@ package
 			
 		}
 		
-		
+		private static function map(v:Number, v0:Number, v1:Number, w0:Number, w1:Number):Number {
+			return w0 + (w1 - w0) * (v - v0) / (v1 - v0);
+		}
 		
 		
 	}
