@@ -1,4 +1,4 @@
-package simplemixer 
+package tests.soundenginetest 
 {
 	import flash.desktop.NativeApplication;
 	import flash.display.Sprite;
@@ -7,6 +7,8 @@ package simplemixer
 	import flash.events.TouchEvent;
 	import flash.media.Sound;
 	import flash.utils.ByteArray;
+	import soundengine.MultiTrack;
+	import soundengine.SamplePlayer;
 	
 	/**
 	 * ...
@@ -21,12 +23,15 @@ package simplemixer
 		private var padRight:Vector.<Number>;
 		
 		private var multiTrack:MultiTrack;
-		private var samplePlayers:Vector.<SamplePlayer> = new Vector.<SamplePlayer>();
+		private var samplePlayers:Vector.<SamplePlayer> = new Vector.<SamplePlayer>(); 
 		
 		private var indexToActivate:int = 1;
 		
 		public function SimpleMixerTest() 
 		{
+			
+			trace(this, "will add another sound source on click (max 16)");
+			
 			addEventListener(Event.ADDED_TO_STAGE, init);
 		}
 		

@@ -1,4 +1,4 @@
-package simplemixer 
+package soundengine 
 {
 	import flash.utils.ByteArray;
 	/**
@@ -7,7 +7,7 @@ package simplemixer
 	 */
 	public class SamplePlayer implements SoundSource
 	{
-		private var _active:Boolean = false;
+		private var _active:Boolean = true;
 		private var _panning:Number = 0;
 		
 		private var dataL:Vector.<Number>;
@@ -61,15 +61,15 @@ package simplemixer
 			soundPitchSourceIndex %= sampleAmount;
 		}
 		
-		public function getLeftAndRight(amount:int, targetLeft:Vector.<Number>, targetRight:Vector.<Number>):void
+		public function generate(amount:int, outputLeft:Vector.<Number>, outputRight:Vector.<Number>):void
 		{
 			// NOT INTERPOLATED:
 			for (var i:int = 0; i < amount; i++) 
 			{ 
 				soundLeftValue = dataL[sourceIndex] * _leftPanGain;
 				soundRightValue = dataR[sourceIndex] * _rightPanGain;
-				targetLeft[i] = soundLeftValue;
-				targetRight[i] = soundRightValue;
+				outputLeft[i] = soundLeftValue;
+				outputRight[i] = soundRightValue;
 				
 				soundPitchSourceIndex += soundPitchFactor;
 				soundPitchSourceIndex %= sampleAmount;

@@ -6,6 +6,7 @@ package
 	import flash.sensors.Accelerometer;
 	import flash.utils.Dictionary;
 	import flash.utils.getTimer;
+	import soundengine.SamplePlayer;
 	import starling.display.Quad;
 	import starling.display.Sprite;
 	import starling.events.EnterFrameEvent;
@@ -278,7 +279,7 @@ package
 				a = spring.getOneEnd().position;
 				b = spring.getOneEnd().position;
 				sx = (a.x + b.x) * 0.5;
-				soundEngine.multiTrack.getSource(s).panning = map(sx, 0, stage.stageWidth, -1, 1);
+				(soundEngine.multiTrack.getSource(s) as SamplePlayer).panning = map(sx, 0, stage.stageWidth, -1, 1);
 				
 			}
 			

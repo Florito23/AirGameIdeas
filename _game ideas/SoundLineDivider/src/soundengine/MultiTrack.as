@@ -1,4 +1,4 @@
-package simplemixer
+package soundengine
 {
 	import flash.events.SampleDataEvent;
 	import flash.media.Sound;
@@ -52,7 +52,7 @@ package simplemixer
 			
 			for (var s:int = 0; s < _sourceAmount; s++) {
 				if (_sources[s].active) {
-					_sources[s].getLeftAndRight(_bufferSize, tempDataL, tempDataR);
+					_sources[s].generate(_bufferSize, tempDataL, tempDataR);
 					for (i = 0; i < _bufferSize; i++) {
 						mixLeftData[i] += tempDataL[i];
 						mixRightData[i] += tempDataR[i];

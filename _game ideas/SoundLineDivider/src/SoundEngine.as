@@ -3,9 +3,9 @@ package
 	import flash.media.Sound;
 	import flash.net.SharedObject;
 	import flash.utils.ByteArray;
-	import simplemixer.MultiTrack;
-	import simplemixer.SamplePlayer;
-	import simplemixer.SoundSource;
+	import soundengine.MultiTrack;
+	import soundengine.SamplePlayer;
+	import soundengine.SoundSource;
 	/**
 	 * ...
 	 * @author Marcus Graf
@@ -80,7 +80,7 @@ package
 			sp.setSoundPitchFactor(baseOctaveFac * stretchFac); //octave 1
 		}
 		
-		public function get multiTrack():MultiTrack 
+		public function get multiTrack():MultiTrack
 		{
 			return _multiTrack;
 		}
