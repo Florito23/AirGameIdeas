@@ -3,8 +3,8 @@
   <id>air.SoundLineDivider</id>
   <versionNumber>0.1</versionNumber>
   <supportedProfiles>mobileDevice</supportedProfiles>
-  <filename>SoundLineDivider</filename>
-  <name>SoundLineDivider</name>
+  <filename>SoundTests</filename>
+  <name>SoundTests</name>
   <android>
     <manifestAdditions><![CDATA[<manifest android:installLocation="auto">
 	<uses-sdk android:minSdkVersion="8" />

@@ -471,7 +471,12 @@ package
 				for (var horizPercentage:Number = 0; horizPercentage <= 1; horizPercentage += hStepPercentage) {
 					
 					var pointOnQuad:Point = Point.interpolate(leftSide, rightSide, horizPercentage);
-					var fieldIndex:int = int(pointOnQuad.y) * hWidth + int(pointOnQuad.x);
+					var fx:int = int(pointOnQuad.x);
+					var fy:int = int(pointOnQuad.y);
+					fx = Math.max(0, Math.min(hWidth - 1, fx));
+					fy = Math.max(0, Math.min(hHeight - 1, fy));
+					var fieldIndex:int = fy * hWidth + fx;
+					//var fieldIndex:int = int(pointOnQuad.y) * hWidth + int(pointOnQuad.x);
 					if (indicesToModify.indexOf(fieldIndex) == -1) {
 						indicesToModify.push(fieldIndex);
 					}

@@ -93,6 +93,8 @@ package
 			_touched = true;
 		}
 		
+		private var minSpeed:Number = 25.0 / 60.0;
+		
 		public function animate():void 
 		{
 			var targetAnimSpeed:Number = 0;
@@ -105,7 +107,7 @@ package
 				_animSpeed = 0.80 * _animSpeed + 0.20 * targetAnimSpeed;
 			} else {
 				_animSpeed = 0.995 * _animSpeed + 0.005 * targetAnimSpeed;
-				if (_animSpeed < 0.25) _animSpeed = 0;
+				if (_animSpeed < minSpeed) _animSpeed = minSpeed;
 			}
 			
 			

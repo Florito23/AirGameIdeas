@@ -29,6 +29,10 @@ package soundengine
 		{
 			_sound = new Sound();
 			_sound.addEventListener(SampleDataEvent.SAMPLE_DATA, onSampleData);
+		}
+		
+		public function play():void
+		{
 			_sound.play();
 		}
 		
@@ -39,6 +43,11 @@ package soundengine
 		
 		public function getSource(index:int):SoundSource {
 			return _sources[index];
+		}
+		
+		public function sourceAmount():int 
+		{
+			return _sourceAmount;
 		}
 		
 		private function onSampleData(e:SampleDataEvent):void 

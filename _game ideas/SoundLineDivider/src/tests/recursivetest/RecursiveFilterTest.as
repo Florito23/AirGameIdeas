@@ -8,6 +8,8 @@ package tests.recursivetest
 	import flash.events.SampleDataEvent;
 	import flash.events.TouchEvent;
 	import flash.media.Sound;
+	import flash.media.SoundMixer;
+	import flash.utils.getTimer;
 	import soundengine.RecursiveFilter;
 	import soundengine.SamplePlayer;
 	import soundengine.SoundChain;
@@ -32,6 +34,7 @@ package tests.recursivetest
 		private var lpfSprite:Sprite;
 		private var hpfSprite:Sprite;
 		private var lpfFourPassSprite:Sprite;
+		private var sound:Sound;
 		
 		public function RecursiveFilterTest() 
 		{
@@ -95,13 +98,14 @@ package tests.recursivetest
 			soundChain.addSoundModifier(lpfFourPass);
 			
 			addEventListener(Event.ADDED_TO_STAGE, init);
+			addEventListener(Event.REMOVED_FROM_STAGE, removed);
 		}
+		
+		
 		
 		private function init(e:Event):void 
 		{
-			removeEventListener(Event.ADDED_TO_STAGE, init);
-			
-			
+			removeChildren();
 			
 			lpfSprite = new Sprite();
 			lpfSprite.graphics.beginFill(0xff8822);
@@ -131,23 +135,43 @@ package tests.recursivetest
 			lines.graphics.lineTo(stage.stageWidth / 3 * 2, stage.stageHeight);
 			addChild(lines);
 			
-			var sound:Sound = new Sound();
+			sound = new Sound();
 			sound.addEventListener(SampleDataEvent.SAMPLE_DATA, onSampleData);
 			sound.play();
 			
 			// set filters:
-			lpfHpf(10, 50);
-			lpfHpf(stage.stageWidth / 3 + 10, stage.stageHeight - 100);
-			lpfHpf(stage.stageWidth - 1, 5);
+			threeFilters(10, 50);
+			threeFilters(stage.stageWidth / 3 + 10, stage.stageHeight - 100);
+			threeFilters(stage.stageWidth - 1, 5);
 			
-			stage.addEventListener(MouseEvent.MOUSE_MOVE, function(e:MouseEvent):void {
-				lpfHpf(e.stageX, e.stageY);
-			});stage.addEventListener(TouchEvent.TOUCH_MOVE, function(e:TouchEvent):void {
-				lpfHpf(e.stageX, e.stageY);
-			});
+			stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+			stage.addEventListener(MouseEvent.CLICK, onClick);
 		}
 		
-		private function lpfHpf(stageX:Number, stageY:Number):void
+		private function removed(e:Event):void 
+		{
+			SoundMixer.stopAll();
+			stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+			stage.removeEventListener(MouseEvent.CLICK, onClick);
+		}
+		
+		private var lti:int = 0;
+		private function onClick(e:MouseEvent):void 
+		{
+			var ti:int = getTimer();
+			var dt:int = ti - lti;
+			lti = ti;
+			if (dt < 250) {
+				parent.removeChild(this);
+			}
+		}
+		
+		private function onMouseMove(e:MouseEvent):void 
+		{
+			threeFilters(e.stageX, e.stageY);
+		}
+		
+		private function threeFilters(stageX:Number, stageY:Number):void
 		{
 			var octave:Number = map(stageY, stage.stageHeight, 0, 0, 10);
 			var octaveToFac:Number = Math.pow(2, octave); // 1..1024

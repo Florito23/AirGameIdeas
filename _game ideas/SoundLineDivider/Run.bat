@@ -4,9 +4,10 @@ call bat\SetupSDK.bat
 call bat\SetupApplication.bat
 
 :target
-goto desktop
+::goto desktop
 ::goto android-debug
 ::goto android-test
+goto android-captive-runtime
 set INTERPRETER=-interpreter
 ::goto ios-debug
 ::goto ios-test
@@ -80,6 +81,13 @@ echo Packaging and Installing application for testing on Android (%DEBUG_IP%)
 echo.
 set TARGET=
 set OPTIONS=
+goto android-package
+
+:android-captive-runtime
+echo.
+echo Packing and installing fully (captive-runtime)
+echo.
+set TARGET=-captive-runtime
 goto android-package
 
 :android-package

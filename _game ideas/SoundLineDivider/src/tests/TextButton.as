@@ -15,24 +15,25 @@ package tests
 	public class TextButton extends SimpleButton 
 	{
 		
-		[Embed(source="VERDANAB.TTF", fontName="Verdana Bold", mimeType="application/x-font-truetype", embedAsCFF="false")]
-		private var VerdanaClass:Class;
+		public static const HEIGHT:int = 60;
+		public static const WIDTH:int = 500;
 		
 		public function TextButton(text:String) 
 		{
 			var sprite:Sprite = new Sprite();
 			
-			Font.registerFont(VerdanaClass);
+			
 			var textField:TextField = new TextField();
 			textField.embedFonts = true;
 			textField.textColor = 0xffffffff;
 			textField.background = true;
 			textField.backgroundColor = 0xff222222;
-			textField.width = 300;
-			textField.height = 40;
-			var format:TextFormat = new TextFormat("Verdana Bold", 24, 0xdddddd);// true);
-			format.align = TextFormatAlign.CENTER;
-			textField.defaultTextFormat = format;
+			textField.width = WIDTH;
+			textField.height = HEIGHT;
+			textField.cacheAsBitmap = true;
+			textField.selectable = false;
+			
+			textField.defaultTextFormat = AllTests.textFormatVerdana32;
 			textField.text = text;
 			textField.selectable = false;
 			sprite.addChild(textField);
