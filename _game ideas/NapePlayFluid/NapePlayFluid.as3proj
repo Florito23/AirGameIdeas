@@ -11,7 +11,7 @@
     <movie version="3" />
     <movie minorVersion="6" />
     <movie platform="AIR Mobile" />
-    <movie background="#FFFFFF" />
+    <movie background="#220A49" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
