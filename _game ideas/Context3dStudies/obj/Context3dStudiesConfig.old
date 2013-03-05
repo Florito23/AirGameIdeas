@@ -16,7 +16,7 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'27/02/2013'</value>
+      <value>'05/03/2013'</value>
     </define>
     <define append="true">
       <name>CONFIG::air</name>
@@ -40,7 +40,7 @@
     </source-path>
   </compiler>
   <file-specs>
-    <path-element>D:\AirGameIdeas\_game ideas\Context3dStudies\src\uploadvectortest\TestWithDoubleTrianglesAndTextures.as</path-element>
+    <path-element>D:\AirGameIdeas\_game ideas\Context3dStudies\src\uploadvectortest\TestWithDoubleTriangles.as</path-element>
   </file-specs>
   <default-background-color>#FFFFFF</default-background-color>
   <default-frame-rate>59</default-frame-rate>

@@ -71,7 +71,7 @@
   </library>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
-    <compile path="src\uploadvectortest\TestWithDoubleTrianglesAndTextures.as" />
+    <compile path="src\uploadvectortest\TestUploadVector.as" />
   </compileTargets>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
