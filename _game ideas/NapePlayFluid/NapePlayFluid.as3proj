@@ -4,7 +4,7 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\NapePlay.swf" />
+    <movie path="bin\NapePlayHex.swf" />
     <movie fps="60" />
     <movie width="480" />
     <movie height="762" />

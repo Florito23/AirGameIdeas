@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <application xmlns="http://ns.adobe.com/air/application/3.6">
 	
-	<id>air.NapePlay</id>
+	<id>air.NapePlayHex</id>
 	<versionNumber>0.1</versionNumber>
 	<supportedProfiles>mobileDevice</supportedProfiles>
 	<filename>NapePlay2</filename>
