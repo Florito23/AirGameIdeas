@@ -4,12 +4,12 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\NapePlayHex.swf" />
+    <movie path="bin\NapePlay.swf" />
     <movie fps="60" />
     <movie width="480" />
     <movie height="762" />
     <movie version="3" />
-    <movie minorVersion="6" />
+    <movie minorVersion="5" />
     <movie platform="AIR Mobile" />
     <movie background="#220A49" />
   </output>

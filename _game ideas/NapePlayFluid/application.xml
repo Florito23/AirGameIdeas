@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?> 
-<application xmlns="http://ns.adobe.com/air/application/3.6">
+<application xmlns="http://ns.adobe.com/air/application/3.5">
 	
-	<id>air.NapePlayHex</id>
+	<id>air.NapePlay</id>
 	<versionNumber>0.1</versionNumber>
 	<supportedProfiles>mobileDevice</supportedProfiles>
-	<filename>NapePlay2</filename>
+	<filename>NapePlay</filename>
 	
-	<name>NapePlay2</name>
+	<name>NapePlay</name>
 	<description></description>
 	<copyright></copyright>
 	

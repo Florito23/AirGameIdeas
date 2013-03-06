@@ -84,8 +84,10 @@ package
 			
 			
 			//accelero = new AccelerometerHandler();
-			
-			addChild(Image.fromBitmap(new back()));
+			var bg:Image = Image.fromBitmap(new back());
+			bg.scaleX = stage.stageWidth / bg.width;
+			bg.scaleY = stage.stageHeight / bg.height;
+			addChild(bg);
 			
 			napeGraphics = new Sprite();
 			addChild(napeGraphics);
@@ -110,7 +112,8 @@ package
             space.listeners.add(ballToBallInteractionListener);
 			
 			var floor:Body = new Body(BodyType.STATIC);
-			floor.shapes.add(new Polygon(Polygon.rect(0, 800, 480, 1)));
+			//floor.shapes.add(new Polygon(Polygon.rect(0, 800, 480, 1)));
+			floor.shapes.add(new Polygon(Polygon.rect(0, stage.stageHeight, stage.stageWidth, 1)));
 			floor.space = space;
 			floor.cbTypes.add(wallCollisionType);
 			
@@ -121,28 +124,35 @@ package
 			ceiling.cbTypes.add(wallCollisionType);
 			*/
 			
+			// inter distance: 80
 			var ceilingL:Body = new Body(BodyType.STATIC);
-			ceilingL.shapes.add(new Polygon(Polygon.rect(0, 0, 200, 8)));
+			//ceilingL.shapes.add(new Polygon(Polygon.rect(0, 0, 200, 8)));
+			ceilingL.shapes.add(new Polygon(Polygon.rect(0, 0, stage.stageWidth/2 - 40, 8)));
 			ceilingL.space = space;
 			ceilingL.cbTypes.add(wallCollisionType);
 			
 			var ceilingR:Body = new Body(BodyType.STATIC);
-			ceilingR.shapes.add(new Polygon(Polygon.rect(280, 0, 200, 8)));
+			//ceilingR.shapes.add(new Polygon(Polygon.rect(280, 0, 200, 8)));
+			ceilingR.shapes.add(new Polygon(Polygon.rect(stage.stageWidth/2+40, 0, stage.stageWidth/2-40, 8)));
 			ceilingR.space = space;
 			ceilingR.cbTypes.add(wallCollisionType);
 			
+			
 			var wallLeft:Body = new Body(BodyType.STATIC);
-			wallLeft.shapes.add(new Polygon(Polygon.rect(0, 0, 1, 800)));
+			//wallLeft.shapes.add(new Polygon(Polygon.rect(0, 0, 1, 800)));
+			wallLeft.shapes.add(new Polygon(Polygon.rect(0, 0, 1, stage.stageHeight)));
 			wallLeft.space = space;
 			wallLeft.cbTypes.add(wallCollisionType);
 			
 			var wallRight:Body = new Body(BodyType.STATIC);
-			wallRight.shapes.add(new Polygon(Polygon.rect(480, 0, 1, 800)));
+			//wallRight.shapes.add(new Polygon(Polygon.rect(480, 0, 1, 800)));
+			wallRight.shapes.add(new Polygon(Polygon.rect(stage.stageWidth, 0, 1, stage.stageHeight)));
 			wallRight.space = space;
 			wallRight.cbTypes.add(wallCollisionType);
 			
 			
-			var waterShape:Polygon = new Polygon(Polygon.rect(0, 0, 480, 800));
+			//var waterShape:Polygon = new Polygon(Polygon.rect(0, 0, 480, 800));
+			var waterShape:Polygon = new Polygon(Polygon.rect(0, 0, stage.stageWidth, stage.stageHeight));
 			waterShape.fluidEnabled = true;
 			waterShape.fluidProperties.density = 0;
 			waterShape.fluidProperties.viscosity = 0.1;
@@ -156,7 +166,7 @@ package
 			
 			addPlayer();
 			
-			for (var i:int = 0; i < 64; i++) 
+			for (var i:int = 0; i < 48; i++) 
 			{
 				addBall();
 			}

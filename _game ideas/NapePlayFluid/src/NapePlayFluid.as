@@ -28,6 +28,7 @@ package
 			super();
 
 			stage.scaleMode = StageScaleMode.NO_SCALE;
+			//stage.scaleMode = StageScaleMode.
 			stage.align = StageAlign.TOP_LEFT;
 			stage.addEventListener(Event.DEACTIVATE, deactivate);
 			
